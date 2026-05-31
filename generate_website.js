@@ -1,0 +1,407 @@
+
+const talksData = [
+    {
+        title: "The Future of AI in Software Development",
+        speakers: ["Dr. Anya Sharma"],
+        category: ["AI", "Machine Learning"],
+        duration: 60,
+        description: "Explore how artificial intelligence is transforming the software development lifecycle, from automated code generation to intelligent testing."
+    },
+    {
+        title: "Modern Frontend Frameworks: A Deep Dive into React",
+        speakers: ["John Doe", "Jane Smith"],
+        category: ["Web Development", "Frontend"],
+        duration: 60,
+        description: "A comprehensive look at React, covering its concepts, hooks, state management, and best practices for building scalable applications."
+    },
+    {
+        title: "Cloud Native Architectures with Kubernetes",
+        speakers: ["Alex Chen"],
+        category: ["Cloud", "DevOps"],
+        duration: 60,
+        description: "Understand the principles of cloud-native development and how Kubernetes helps in deploying, managing, and scaling containerized applications."
+    },
+    {
+        title: "Demystifying Cybersecurity for Developers",
+        speakers: ["Maria Rodriguez"],
+        category: ["Cybersecurity", "Privacy"],
+        duration: 60,
+        description: "Learn essential cybersecurity practices and common vulnerabilities to build more secure applications from the ground up."
+    },
+    {
+        title: "Ethical AI: Building Responsible Technology",
+        speakers: ["Dr. Emily White", "David Green"],
+        category: ["AI", "Ethics"],
+        duration: 60,
+        description: "Discuss the ethical considerations in AI development, focusing on bias, fairness, transparency, and accountability."
+    },
+    {
+        title: "Scalable Backend APIs with Node.js and Express",
+        speakers: ["Carlos Gomez"],
+        category: ["Web Development", "Backend"],
+        duration: 60,
+        description: "Design and implement high-performance, scalable RESTful APIs using Node.js, Express.js, and best database practices."
+    }
+];
+
+const generateHtml = (talks) => {
+    const startTime = new Date();
+    startTime.setHours(10, 0, 0, 0); // Event starts at 10:00 AM
+
+    let currentTime = new Date(startTime);
+    let scheduleHtml = '';
+    const eventItems = [];
+
+    talks.forEach((talk, index) => {
+        const talkStartTime = new Date(currentTime);
+        const talkEndTime = new Date(currentTime.getTime() + talk.duration * 60 * 1000);
+
+        eventItems.push({
+            type: 'talk',
+            start: talkStartTime,
+            end: talkEndTime,
+            data: talk
+        });
+
+        currentTime = new Date(talkEndTime);
+
+        if (index < talks.length - 1) {
+            // Add transition time
+            eventItems.push({
+                type: 'transition',
+                start: currentTime,
+                end: new Date(currentTime.getTime() + 10 * 60 * 1000),
+                data: null // No specific data for transition
+            });
+            currentTime = new Date(currentTime.getTime() + 10 * 60 * 1000);
+        }
+
+        // Insert lunch break after the third talk
+        if (index === 2) {
+            eventItems.push({
+                type: 'lunch',
+                start: currentTime,
+                end: new Date(currentTime.getTime() + 60 * 60 * 1000),
+                data: null // No specific data for lunch
+            });
+            currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000);
+
+            // Add transition time after lunch
+             eventItems.push({
+                type: 'transition',
+                start: currentTime,
+                end: new Date(currentTime.getTime() + 10 * 60 * 1000),
+                data: null
+            });
+            currentTime = new Date(currentTime.getTime() + 10 * 60 * 1000);
+        }
+    });
+
+    eventItems.forEach(item => {
+        const itemStartTime = item.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const itemEndTime = item.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        if (item.type === 'talk') {
+            const talk = item.data;
+            scheduleHtml += '' +
+                '<div class="schedule-item talk" data-categories="' + talk.category.map(c => c.toLowerCase()).join(' ') + '">' +
+                '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                '    <div class="details">' +
+                '        <h3>' + talk.title + '</h3>' +
+                '        <p class="speakers">Speakers: ' + talk.speakers.join(' & ') + '</p>' +
+                '        <p class="category">Categories: ' + talk.category.join(', ') + '</p>' +
+                '        <p class="description">' + talk.description + '</p>' +
+                '    </div>' +
+                '</div>';
+        } else if (item.type === 'lunch') {
+            scheduleHtml += '' +
+                '<div class="schedule-item lunch">' +
+                '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                '    <div class="details">' +
+                '        <h3>Lunch Break</h3>' +
+                '        <p>Enjoy your meal!</p>' +
+                '    </div>' +
+                '</div>';
+        } else if (item.type === 'transition') {
+             scheduleHtml += '' +
+                '<div class="schedule-item transition">' +
+                '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                '    <div class="details">' +
+                '        <p>Transition Time</p>' +
+                '    </p></div>' +
+                '</div>';
+        }
+    });
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Event Schedule</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            border-bottom: 2px solid #eceff1;
+            padding-bottom: 15px;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e9eff1;
+            border-radius: 8px;
+        }
+        .search-container input[type="text"] {
+            width: 70%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-right: 10px;
+            box-sizing: border-box;
+        }
+        .search-container button {
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .search-container button:hover {
+            background-color: #2980b9;
+        }
+        .schedule-item {
+            background-color: #ecf0f1;
+            border-left: 5px solid #3498db;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .schedule-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .schedule-item .time {
+            font-weight: bold;
+            color: #34495e;
+            flex: 0 0 120px;
+            margin-right: 20px;
+            font-size: 1.1em;
+        }
+        .schedule-item .details {
+            flex-grow: 1;
+        }
+        .schedule-item h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .schedule-item p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .schedule-item .speakers {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        .schedule-item .category {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .schedule-item.lunch {
+            background-color: #f7dc6f;
+            border-left-color: #f39c12;
+        }
+        .schedule-item.lunch h3 {
+            color: #e67e22;
+        }
+        .schedule-item.transition {
+            background-color: #dbe4e6;
+            border-left-color: #95a5a6;
+            font-style: italic;
+            color: #7f8c8d;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 10px 20px;
+        }
+        .schedule-item.transition .time {
+            flex: none;
+        }
+        .schedule-item.transition .details {
+            flex-grow: 0;
+        }
+        @media (max-width: 600px) {
+            .schedule-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .schedule-item .time {
+                margin-bottom: 10px;
+                text-align: center;
+                flex: none;
+            }
+            .search-container input[type="text"] {
+                width: 95%;
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+            .search-container button {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tech Talks Event Schedule</h1>
+
+        <div class="search-container">
+            <input type="text" id="categorySearch" placeholder="Search by category (e.g., AI, Web Development)">
+            <button onclick="filterTalks()">Search</button>
+        </div>
+
+        <div id="schedule">
+            <!-- Schedule items will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const talksData = [{"title":"The Future of AI in Software Development","speakers":["Dr. Anya Sharma"],"category":["AI","Machine Learning"],"duration":60,"description":"Explore how artificial intelligence is transforming the software development lifecycle, from automated code generation to intelligent testing."},{"title":"Modern Frontend Frameworks: A Deep Dive into React","speakers":["John Doe","Jane Smith"],"category":["Web Development","Frontend"],"duration":60,"description":"A comprehensive look at React, covering its core concepts, hooks, state management, and best practices for building scalable applications."},{"title":"Cloud Native Architectures with Kubernetes","speakers":["Alex Chen"],"category":["Cloud","DevOps"],"duration":60,"description":"Understand the principles of cloud-native development and how Kubernetes helps in deploying, managing, and scaling containerized applications."},{"title":"Demystifying Cybersecurity for Developers","speakers":["Maria Rodriguez"],"category":["Cybersecurity","Privacy"],"duration":60,"description":"Learn essential cybersecurity practices and common vulnerabilities to build more secure applications from the ground up."},{"title":"Ethical AI: Building Responsible Technology","speakers":["Dr. Emily White","David Green"],"category":["AI","Ethics"],"duration":60,"description":"Discuss the ethical considerations in AI development, focusing on bias, fairness, transparency, and accountability."},{"title":"Scalable Backend APIs with Node.js and Express","speakers":["Carlos Gomez"],"category":["Web Development","Backend"],"duration":60,"description":"Design and implement high-performance, scalable RESTful APIs using Node.js, Express.js, and best database practices."}];
+
+        function renderSchedule(talksToRender) {
+            const scheduleDiv = document.getElementById('schedule');
+            scheduleDiv.innerHTML = ''; // Clear existing schedule
+
+            const startTime = new Date();
+            startTime.setHours(10, 0, 0, 0); // Event starts at 10:00 AM
+
+            let currentTime = new Date(startTime);
+            const eventItems = [];
+
+            talksToRender.forEach((talk, index) => {
+                const talkStartTime = new Date(currentTime);
+                const talkEndTime = new Date(currentTime.getTime() + talk.duration * 60 * 1000);
+
+                eventItems.push({
+                    type: 'talk',
+                    start: talkStartTime,
+                    end: talkEndTime,
+                    data: talk
+                });
+
+                currentTime = new Date(talkEndTime);
+
+                if (index < talksToRender.length - 1) {
+                    eventItems.push({
+                        type: 'transition',
+                        start: currentTime,
+                        end: new Date(currentTime.getTime() + 10 * 60 * 1000),
+                        data: null
+                    });
+                    currentTime = new Date(currentTime.getTime() + 10 * 60 * 1000);
+                }
+
+                // Insert lunch break after the third talk
+                if (index === 2) {
+                    eventItems.push({
+                        type: 'lunch',
+                        start: currentTime,
+                        end: new Date(currentTime.getTime() + 60 * 60 * 1000),
+                        data: null
+                    });
+                    currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000);
+
+                    eventItems.push({
+                        type: 'transition',
+                        start: currentTime,
+                        end: new Date(currentTime.getTime() + 10 * 60 * 1000),
+                        data: null
+                    });
+                    currentTime = new Date(currentTime.getTime() + 10 * 60 * 1000);
+                }
+            });
+
+            eventItems.forEach(item => {
+                const itemStartTime = item.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const itemEndTime = item.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let itemHtml = '';
+
+                if (item.type === 'talk') {
+                    const talk = item.data;
+                    itemHtml = '' +
+                        '<div class="schedule-item talk" data-categories="' + talk.category.map(c => c.toLowerCase()).join(' ') + '">' +
+                        '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                        '    <div class="details">' +
+                        '        <h3>' + talk.title + '</h3>' +
+                        '        <p class="speakers">Speakers: ' + talk.speakers.join(' & ') + '</p>' +
+                        '        <p class="category">Categories: ' + talk.category.join(', ') + '</p>' +
+                        '        <p class="description">' + talk.description + '</p>' +
+                        '    </div>' +
+                        '</div>';
+                } else if (item.type === 'lunch') {
+                    itemHtml = '' +
+                        '<div class="schedule-item lunch">' +
+                        '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                        '    <div class="details">' +
+                        '        <h3>Lunch Break</h3>' +
+                        '        <p>Enjoy your meal!</p>' +
+                        '    </div>' +
+                        '</div>';
+                } else if (item.type === 'transition') {
+                    itemHtml = '' +
+                        '<div class="schedule-item transition">' +
+                        '    <div class="time">' + itemStartTime + ' - ' + itemEndTime + '</div>' +
+                        '    <div class="details">' +
+                        '        <p>Transition Time</p>' +
+                        '    </div>' +
+                        '</div>';
+                }
+                scheduleDiv.innerHTML += itemHtml;
+            });
+        }
+
+        function filterTalks() {
+            const searchTerm = document.getElementById('categorySearch').value.toLowerCase();
+            const filteredTalks = talksData.filter(talk =>
+                talk.category.some(cat => cat.toLowerCase().includes(searchTerm))
+            );
+            renderSchedule(filteredTalks);
+        }
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSchedule(talksData);
+        });
+    </script>
+</body>
+</html>
+    
